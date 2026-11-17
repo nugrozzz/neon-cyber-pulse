@@ -1,0 +1,700 @@
+# best-game-01: "Make the best game", judged by the house AI judge on a dossier (program/v1 + harness.judge, media
+# dossier, a screened final). It landed first sealed as status: draft / visibility: internal (new-bounty SKILL.md
+# 8.3), off production's seed catalogue, so dev seeded it on its shipped status and an admin saw its page before the
+# opening (https://dev.make.fun/bounty/best-game-01, 2026-11-15T14:40Z). The open seal (SKILL.md 8.7), on the owner's
+# answer of 2026-11-15, "Open 18:00 UTC today, or as soon as ready": status open and visibility public, a block of its
+# own in production's seed catalogue (deploy/k8s/overlays/makefun-prod/seed-catalogue.txt) and its catalogue row
+# (tests/unit/catalogue.test.ts OPENED_IN_TURN), SHIPPED_BUNDLE_SHA256 pinned last; the opening kept the sealed dates.
+#
+# The owner's ask, 2026-11-15, verbatim: "like this one https://make.fun/bounty/threejs-fps-02 but let's remove the
+# threejs and fps constraint - let's just say "make the best game" as the challenge, $1,000 and it runs for 3 days". So
+# this bundle is threejs-fps-02 with the three.js and first-person-shooter constraints taken out: any genre of game
+# that plays offline in a desktop browser from static files under game/ (game/index.html), with keyboard and mouse and
+# no network request, any JavaScript library vendored under game/ (three.js, Phaser, PixiJS, a WebAssembly build as an
+# asset) or none; the same $1,000 ten-place table, entries open 72 hours. Every sentence of threejs-fps-02 was
+# refreshed for it, and its stale lines left behind: the judge reading each source whole up to 160 KiB (a dossier heat
+# sends the dossier-view/v1 view: .cosmos/rules/contest-design.mdc, judge-heat.mdc), the Transcripts section's "never
+# published" sentence, "the game's files are the owner's and admins' alone at every time" (the top 3 are hosted:
+# below), WebGL 2 in the prerequisites, and the Transcript gate lines (today's, printed below).
+#
+# What wins, and what it beats. The public starting points for a browser game are the engines' own templates and
+# examples (Phaser's project templates, three.js's examples, PixiJS's demos) and the game-jam archives (js13kGames,
+# Ludum Dare and itch.io HTML5 jams): a template is a scaffold with no game in it, an engine example shows one feature,
+# and a jam game is finished in 48 hours or 13 KB, most with one level, no restart, no sound and no tuning. An entry
+# here must be a complete, original, OSI-licensed game that runs offline from its own static files: a goal, rules,
+# responsive controls, a way to win, lose or score, a start and a restart and feedback on every action, with its own
+# idea, art, sound and names. The winner is a playable open-source game and a reusable base for web games, played live
+# from make.fun's site (the top 3 are hosted: below) and featured in its posts.
+#
+# Each entry's program, main.ts (Node 22), hands in a game it built: it copies game/ (the playable game as static
+# files) and screenshots/ (3 or 4 PNG or JPEG screens) from its repository to /output, and writes /output/dossier.json
+# with vendor/makefun-game.ts buildDossier, the library the kit ships (sdk/game/makefun-game.ts, a fork of
+# sdk/threejs/makefun-threejs.ts without three.js and with the same buildDossier, byte for byte the scorer's own copy).
+# The sealed gate (scorer/score.ts, its limits reference/gate.json) checks five rows and writes valid from the first
+# four; the judge, superbot at reasoning_effort high on superbot-router, reads two entries at a time, each as its
+# dossier's dossier-view/v1 view (server/judging/dossier-view.ts at dossierViewBudgetOf's 1,536 input tokens an entry:
+# one JPEG contact sheet of every screenshot, the cover on top, then an outline of the source, each file's path, size
+# and declarations), never the whole source, and picks one with a margin from 1 to 5 (verdict v2); the entries rank by
+# win rate (resolution.method judges). Its output budget, reasoning included, is max_output_tokens 17200: 1.5 x the p99
+# of the output tokens an attempt took in the first calibration (below; p50 1,174, p90 4,375, p99 11,456, the most
+# 12,100, the cap then), house-models.mdc's and contest-sizing.mdc's sizing; the rules quote it. The top 5 of the
+# settled final heat are held up to 60 minutes for the make.fun team's finalist review (harness.judge.review), which
+# plays each by serving game/ with a static file server and opening index.html in desktop Chrome.
+#
+#   scorer/            score.ts (the five rows: game_files, references, screenshots and dossier_matches decide validity,
+#                      js_parses is shown only), images.ts (PNG and JPEG reading), makefun-game.ts (the game reader and
+#                      buildDossier, sdk/game/makefun-game.ts byte for byte) and vendor/acorn.mjs (acorn 8.19.0,
+#                      pinned by its sha256) with vendor/LICENSE (acorn's MIT): threejs-fps-02's gate without its
+#                      three_js row and with the import map optional (one at most, and usable, else references fails);
+#                      its references row takes what a bundler's output and an Emscripten build hold: a data: URI
+#                      passes anywhere, a root-relative path (Vite's /assets/index-abc.js) is read from game/'s root,
+#                      as a static server serves game/, and a dynamic import('node:…') or of an unmapped bare
+#                      specifier (Emscripten's import('module')) is passed over, while a static node: or unmapped bare
+#                      import, an absolute URL and a protocol-relative //host one fail; it checks only the scripts and
+#                      modules index.html reaches (its classic and module scripts and modulepreload links, then each
+#                      .js or .mjs file under game/ one of them imports, re-exports or import()s by a literal), so the
+#                      rest of a library vendored whole is never read, and its detail counts the files left unchecked
+#                      and the dynamic imports passed over; it never follows what a game loads at run time (a Worker,
+#                      importScripts, an audio worklet, an injected script, a fetch), which the finalist review plays.
+#   reference/         gate.json: threejs-fps-02's limits without the three.js digests: game/ at most 993 files and
+#                      directories together and 48 MiB in all, each path at most 1,000 UTF-8 bytes, game/index.html a
+#                      regular file of at most 1 MiB, 3 to 4 screenshots of at most 256 KiB, long side at most 1280
+#                      and short side at least 480 pixels, the dossier at most 1.5 MiB and its text at most 163,840
+#                      bytes (160 KiB).
+#   judge/prompt.txt   the judge's persona and its rubric, five genre-neutral criteria ranked most important first (a
+#                      complete game; fun and depth; feel and polish; look and originality; structure) and the
+#                      close-pair rule, published word for word in the rules. Criteria 1 and 5 ask only what the view
+#                      shows, revised after the first calibration (below): 1 wants every part of a complete game shown
+#                      in screenshots of the game itself, and 5 judges the structure the outline shows (the game's own
+#                      source split into files with one clear job each, named for what they do), since the judge sees
+#                      file headings and declarations, rarely code, and an engine build the rules invite keeps its
+#                      code under vendor/, out of the outline.
+#   judge/anchors/     the four house games, weak to strong (1-weak, 2-plain, 3-mid, 4-strong), each a dossier as an
+#                      entry writes one; 2-plain is the starter's own dossier, byte for byte.
+#   ladder/            the calibrated dev ladder (harness.judge.ladder): calibration.json and rungs/5-pro.json,
+#                      rungs/6-elite.json and rungs/7-ace.json; the screen and the provisional heats read it, the final
+#                      heat's games never do.
+#   starter/           a working entry laid out as an entrant's repository (main.ts, serve.ts, vendor/makefun-game.ts,
+#                      game/, three screenshots, shots.json and its LICENSE): a plain, complete 2D canvas
+#                      dodge-and-collect game whose dossier is byte for byte house game 2-plain, so handed in unchanged
+#                      it plays as that game.
+#
+# The house games: seven original games written for this bundle, each laid out as an entry (game/, shots.json,
+# screenshots/), every name, picture and sound their own, made in code. Weakest first:
+#   1-weak    Square (scripts/best-game/house/1-weak): a click toy, not a game: a grey page, one grey square button
+#             and a counter; no goal, no end, no restart. 2 files, 1,600 bytes; screenshots 1-start, 2-play, 3-later.
+#   2-plain   Block Dodger (the starter): a plain, complete 2D canvas dodge-and-collect game in plain ES modules: a
+#             paddle dodges falling blocks and catches coins, a title screen with the best score, score, level and
+#             lives HUD, a level every 12 s to level 12, pause, game over and restart, the best score kept in
+#             localStorage; flat colours, no sound, no particles. 8 files, 22,260 bytes; 1-start, 2-play, 3-end.
+#   3-mid     Sparkward (scripts/best-game/house/3-mid): a top-down 2D canvas arena shooter: growing waves of three
+#             enemy kinds (drifter, spitter, brute), spread-shot and heal pickups, a title with the game playing behind
+#             it, score, best, wave and health HUD, wave banners, game over with stats and restart; particles and
+#             shake, no sound; a fixed 60 Hz step and object pools. 13 files, 41,393 bytes; 1-play, 2-title, 3-over.
+#   4-strong  Mosslight (scripts/best-game/house/4-strong): a pixel-art side-scrolling platformer drawn at 320x180 and
+#             scaled 4x: four hand-built levels each with its own art and hazards, four enemy kinds, embers, hidden
+#             sunstones and lantern checkpoints, coyote time and jump buffering, WebAudio sound, a title that is the
+#             level select with saved progress, pause, level-clear, game-over and win screens. 22 files, 109,250
+#             bytes; 1-play, 2-caverns, 3-title, 4-win.
+#   5-pro     Sunsprint: The Heliotrope Tour (scripts/best-game/house/5-pro): a three.js solar-car racer across
+#             the Dusk Belt: five circuits (a sunset strand, a lantern city, a frozen pass, a lava caldera and salt
+#             flats under a giant's ribs), sun powers (Sunburst, Flare Lance, Prism Ward, Cinder Trail) charged by
+#             sunshards, drifts and slipstreams, rivals that fire their own, four event kinds (circuit race, Dusk Fall
+#             knock-out, Sun Chase time trial, Warden Duel against a region boss), a career of 5 regions x 3 events
+#             and 45 stars with purses and five warden bosses, a tuning tree of 4 branches x 3 tiers of opposed parts,
+#             tour map, briefing, garage and results screens, progress saved in localStorage. 58 files, 2,394,334
+#             bytes (three.js 0.187.0 vendored under game/vendor/three/, never read as source); 1-ribs, 2-tour,
+#             3-garage, 4-fall.
+#   6-elite   Gloamvault (scripts/best-game/house/6-elite): a 2D pixel-art roguelite dungeon crawler: three procedural
+#             floors of room graphs, 8 foe kinds with elites and flow-field pathing, 3 bosses with phases, 23 relics
+#             with trade-offs, a shop, altars and keys, lantern lighting, hit-stop, shake and particles, WebAudio
+#             effects and a sequenced score, minimap, title, pause, death and victory screens with a run summary.
+#             24 files, 192,073 bytes; 1-fight, 2-boss, 3-title, 4-victory.
+#   7-ace     Gloamward (scripts/best-game/house/7-ace): a three.js tower-defence game on floating hex islands at
+#             night where light is the ground you fight on (build only where it is lit; some foes are hit only in
+#             light, others snuff it): 5 generated islands and 57 waves, a tutorial, 6 works with upgrades and two
+#             final forms each, 9 enemy kinds and a 3-phase final boss, abilities and boons, three difficulties,
+#             settings, a guide, generative WebAudio music, pause, Victory and Defeat screens with stars, five stats
+#             and Play again; its simulation a pure 1/60 s fixed step apart from rendering. 43 files, 2,412,957
+#             bytes (three.js vendored as 5-pro's); 1-play, 2-title, 3-boss, 4-victory.
+# The two lower rungs hold the slots their measured strength gives them: Sunsprint was 6-elite and Gloamvault 5-pro
+# until calibration run 2 measured the racer below the roguelite (below), and the directories swapped before run 3
+# (each game's files unchanged; neither game names its slot), so each run's record keeps the names it was judged
+# under.
+# Every screenshot is a real render of the game's own code, never cropped, edited or composited: each game draws its
+# shot scenes deterministically from ?shot=<scene>&seed=<n> (a seeded generator, fixed simulated time, no wall clock)
+# and the renderer takes the 1280x720 viewport as a JPEG of at most 262,144 bytes once window.__shotReady is set, in
+# headless Chromium on a Namespace Linux box (linux/amd64): 1-weak, 2-plain, 3-mid, 4-strong and 7-ace in the
+# mcr.microsoft.com/playwright Docker image (v1.65.1-noble), 6-elite with the box's own Chromium 149 under playwright-core
+# (--use-angle=swiftshader), 5-pro as its rebuild (commit 339f392a8) rendered it; each game was play-tested there
+# with scripted keyboard and mouse through its start, play, end and restart (1-weak, which has none, by its clicks),
+# with no page error and no outside request.
+# scripts/best-game/house/build-dossiers.mjs writes the dossiers as an entry's main.ts would (game/ and screenshots/
+# copied, buildDossier at reference/gate.json's caps, built twice and compared), runs the sealed scorer on each output
+# as the grader does (valid 1 for all seven, every row passing) and checks each judge view within 1,536 tokens; its
+# 2-plain is byte for byte what the starter's own main.ts writes. The dossiers: 1-weak 29,329 bytes (sha256
+# 85d607ac…), 2-plain 109,574 (e66bada6…), 3-mid 296,647 (1881cb80…), 4-strong 530,698 (61ba32c4…), 5-pro 873,814
+# (1c18fa01…), 6-elite 695,932 (70664141…), 7-ace 767,701 (98e208fc…; 762,154, ef6e3b6b…, before its screenshots
+# were redrawn); 5-pro's, 6-elite's and 7-ace's texts reach the 160 KiB cap, which the outline the judge reads never
+# does.
+#
+# The calibration (harness.judge.ladder, ladder/): the seven house games on this judge and agent, every pair in both
+# slot orders at one judge call in flight, on a scratch copy (.tmp/calibrate/best-game-01: the bundle's trees and this
+# draft as competition.yaml with no ladder, screened or contend block, which the record does not bind, and no
+# BUNDLE_PENDING). Run 3 is the sealed one: `nice -n 10 node --env-file=<router env> cli/makefun.ts grade-local --kit
+# .tmp/calibrate/best-game-01 --calibrate --rungs .tmp/calibrate/rungs-best-game-01 --repeats 4 --seed 20261117 --save
+# .tmp/calibrate/save3-best-game-01`, 2026-11-15T12:54Z to 14:01Z (67 minutes of wall time): 168 calls, 168 attempts
+# (none asked again, every answer finishing at stop), 0 invalid, $0.44 metered ($0.441122), 23.8 s a call; the two
+# slot orders named the same winner in 81 of 84 games (the 3 split were all 5-pro against 6-elite); output tokens an
+# attempt p50 936, p90 4,595, p99 8,973, the most 13,834, under the 17,200 budget. Strengths weakest first: 1-weak
+# 0.0138, 2-plain 0.162, 3-mid 0.640, 4-strong 1.327, 5-pro 2.662, 6-elite 3.085, 7-ace 6.090, all seven in their
+# named order; adjacent p 0.922 (2-plain over 1-weak), 0.798, 0.675, 0.667 (5-pro over 4-strong), 0.537 (6-elite over
+# 5-pro), 0.664 (7-ace over 6-elite); phi 0.100, its floor, pooled over 11 informative pairs. 5-pro and 6-elite won a
+# game each and drew 2 (6-elite 4.3 of 8 call points), and 7-ace won all 4 of its games against each (6.0 and 6.1 of
+# 8 call points), the judge's reasons now citing its title, HUD and Victory screen with stars, stats and Play again.
+# The proof: `nice -n 10 node cli/makefun.ts grade-local --kit .tmp/calibrate/best-game-01 --regrade-from
+# .tmp/calibrate/save3-best-game-01/calibration.json --rungs .tmp/calibrate/rungs-best-game-01 --save
+# .tmp/calibrate/regrade3-best-game-01` rebuilt the record with no model call, its calibration.json and each of
+# rungs/5-pro.json, rungs/6-elite.json and rungs/7-ace.json byte for byte the run's (cmp), the same ladder tree
+# sha256 0b27667e…; record sha256 531aff7e…. ladder/ is run 3's saved ladder, copied whole.
+# Two earlier runs were never sealed, each record keeping the names it was judged under. Run 1 (the first prompt,
+# max_output_tokens 12100, the first racer as 6-elite; --repeats 8, seed 20261115: 336 calls, 1 invalid, $0.95) fit
+# that racer below 5-pro (Gloamvault), losing all 8 games to it, so the racer was redrawn (commit 339f392a8),
+# criteria 1 and 5 revised and the output budget raised to 17200. Run 2 (this prompt and agent, judge_sha256
+# 2f025609…; --repeats 4, seed 20261116: 168 calls, 0 invalid, $0.44, record 01d2afca…) held the anchors in order but
+# fit 6-elite (Sunsprint, the racer) at 2.448 below 5-pro (Gloamvault) at 3.781 and 7-ace at 4.037, only p 0.516 over
+# 5-pro, the judge's reasons citing criterion 1: the racer's screenshots (race views and menus) and 7-ace's then
+# (1-play, 2-boss, 3-title, 4-choice) showed no start, win, results or restart screen. So before run 3 the two lower
+# rungs swapped slots, so that each slot's name matches its measured strength: Sunsprint (the racer) became 5-pro and
+# Gloamvault (the roguelite) 6-elite (their directories under scripts/best-game/house/ swapped, the games' files
+# unchanged), run 3's names assigned before any of its calls and no sealed record relabelled; and 7-ace's screenshots
+# were redrawn to show its whole loop (1-play, 2-title, 3-boss, 4-victory).
+#
+# The judge view. A dossier heat sends each entry's dossier-view/v1 view, never the dossier whole: at 1,536 input tokens
+# an entry the screenshots go on one contact sheet (1,120 tokens) and the outline has the rest, (1,536 - 1,120) x 3 =
+# 1,248 bytes as escaped in the request's JSON. So the judge sees the game mostly through its screenshots, and the rules
+# say so (the dossier and judge sections, the size tips). Their screenshot tip says the judge weighs whether the
+# screenshots show the whole loop (a start or title screen, play, and a win, loss or results screen with its restart):
+# of run 3's 168 reasons (ladder/calibration.json), 137 name a start, title, end or restart screen by the word, 145 to
+# 154 by wider readings (game over, victory, results, play again), so "more than four in five". threejs-fps-02, screenshot-led like this one, kept 95% of
+# whole-dossier verdicts at 1,536 in the paired replay (server/judging/dossier-view-budget.ts). A judge call is the
+# prompt, the house suffix and two views, held to JUDGE_CALL_INPUT_TOKENS_MAX 5,120 (the preflight's judge-call-budget
+# row).
+#
+# The heat. Ten paid places, so the playoff is left unnamed: the last paid place and 2 more (judgePlayoffPlaces: 12),
+# which load.ts judgePlayoffIssue takes. A new house bundle opts in to the screened final (harness.judge.screened: {}),
+# which needs the calibrated ladder: its shortlist line sits at place 40, max(shortlist_per_paid 4 x the last paid place
+# 10, shortlist_min 32), so every playoff place is inside it. 3 Swiss rounds, the count every simulated screened figure
+# plays (judge-screened.mdc); playoff_repeats 1, as threejs-fps-02 and token-radar-01, so each pair of the 12 plays
+# once, then top_repeats 3 more games between the top two. The dev phase plays the four anchors once each, then 2
+# adaptive rounds of 4 games over the seven ladder members nearest even (12 games, 24 calls), and 2 more such rounds
+# (screened.dev_rounds) for an entry whose interval reaches the money-place line (40 calls): house-only, as every dev
+# ladder game. Contender rounds are off (screened.contender_games 0): the screen's house-only floor makes them buy the
+# final no saving. Contend is on (harness.judge.contend {band: 100, games: 8, top: 20}; contracts/competition.ts
+# programJudgeIssues accepts it on a dossier bundle: it asks for a ladder, one named judge model, no harness.pack and
+# contender_games 0, and names no medium): the dev board's top 100 by house-only rate play up to 8 sealed games each
+# against one another on the same judge, their board rates counting them; 8 games, not 12, because a 72-hour window's
+# churn through the band multiplies the calls (judging.md, "Contend": band 100 at 8 games kept most of the gain at
+# about 4.4-5% of the dev calls). superbot is dialled on superbot-router alone and a router heat sends each call once
+# (grader/judge-backup.ts judgeBackupRuleOf); an answer with no verdict is asked once more (grader/judge-call.ts
+# JUDGE_CALL_ATTEMPTS 2). The rules say so.
+#
+# No spend cap: house judging has none (.cosmos/rules/grading.mdc: "no dollar cap on a judge"); this bundle names
+# neither max_total_usd nor dev_daily_usd, and the rules name no cap.
+#
+# The tie-break: an exact tie on the win rate goes to the playoff games between the tied entries (head_to_head), then
+# to the smaller dossier.json, the Size column (performance.judge.artifact_bytes, sorting asc,
+# leaderboard.tie_break_index 4), then to the earlier receipt.
+#
+# The money and the dates: $1,000 in placement rewards, $400 / $200 / $120 and $40 each for 4th to 10th, one place per
+# entrant: threejs-fps-02's ten-place table, the owner's "$1,000". Entries are open 72 hours (the owner's "3 days"),
+# the dev phase with them, from opens_at 2026-11-15T18:00:00Z to the deadline 2026-11-18T18:00:00Z; the final phase
+# runs from 2026-11-18T18:10:00Z (COMMIT_WINDOW_WARN_SECONDS after the deadline) to 2026-11-19T06:10:00Z, 12 hours.
+# The opening is the owner's "18:00 UTC today": 5 hours 30 minutes after the nearest catalogue opening before it
+# (makefun-frontend-01's, 2026-11-15T12:30:00Z) and 23 hours before the next (threejs-fps-01's, 2026-11-16T17:00:00Z),
+# so the 30-minute stagger holds. The deadline is the same instant as markdown-render-speed-02's provisional deadline
+# (2026-11-18T18:00:00Z), a draft's, which the stagger's openings do not count: that draft moves its deadline 30 minutes
+# off this one when it opens (deadlines 30 minutes apart). Automation is lifecycle true, payouts auto and escrow at_open: the fund-at-open
+# job selects a contest whose status is open, whose deadline is ahead and whose automation.escrow is at_open
+# (server/chain/jobs/fund-escrow.ts fundableAtOpen), and the chain sync runs every minute (server/chain/worker.ts), so
+# within a minute of the deploy that seeds it open the worker moves the whole $1,000 from make.fun's reward wallet into
+# the competition's escrow on Solana, before entries open; the Payout, Submitting and resolution lines say both outcomes
+# in the btc-race release template's words (server/releases/templates/btc-race.ts).
+# No challenge window; no entry fee; no house.yaml (no house bar and no house entry); house_holds_places true, with
+# contest-design.mdc's sentence in the Rewards section.
+#
+# Hosting. best-game-01 is in server/hosting/registry.ts HOSTED_COMPETITIONS (dir game/, top 3, slugPrefix game; as
+# threejs-fps-01/02, whose prefix is fps; commit b8732b6e9): from the final phase's lock the entry-hosting sweep
+# (server/hosting/sweep.ts) publishes the game/ of the public board's top 3 lines (server/hosting/select.ts: the dev
+# board until the final's finalized_at, then the final's) at https://game-<8 hex of the submission id>.superbot.sh/,
+# with a Play link; one that leaves the top 3 is taken down 10 minutes later before the results (UNPUBLISH_GRACE_MS)
+# and at once after them; a house entry or one whose source is taken down is never hosted
+# (server/routes/archive/judge.ts entryHostable). The rules' What is public and the Hosting criterion say so without
+# naming the hosting domain: on dev (2026-11-15T14:40Z) the page linked the house model's name inside it, so the copy
+# says each game is hosted at its own web address with a Play link on the page.
+#
+# After the deadline: no screened final has run yet, so the rules state its time from the grading load below at the
+# field this bounty is expected to draw: about 13,000 final entries, 10,000 to 17,000 (threejs-fps-02's arrivals as
+# read 2026-11-15T10:00Z, its launch burst and 235 new entrants an hour after it, run over 72 hours: 17,300 with no
+# decay, 11,600 at a 36-hour half-life, 10,000 at a 24-hour one). At 10,000 to 15,000 final entries the rules say
+# about 5 to 17 hours in all, deadline to result (from the grades at 64 lanes and 60 s a grade with the expected
+# screened calls, to the priced 120 s on 48 lanes with the bound's calls, the finalist review's hour included), and at
+# the slowest 20 to 30 hours (every run at its wall and every call judgeScreenedCallBound at JUDGE_CALLS_A_SECOND
+# allows, plus the review's hour): "at most the grading budget's bound" with the review's 60 minutes on top; and they
+# say the Final phase's 12 hours does not cut it short. The preflight's own figure is at 2,000 entries (the budget below). The last judged final
+# to publish before these rules were written, food-picture-01's (an unscreened image final, 6,298 submissions), published
+# its result 3 hours 26 minutes after its deadline (production's API, read 2026-11-15: deadline 2026-11-15T00:00Z, final
+# finalized 2026-11-15T03:26:21Z); the rules say so with no date. A judged final publishes once the heat and the checks
+# after it are done, at whatever hour (server/competitions/lifecycle/auto.ts); the phase's end decides nothing.
+#
+# The budget, as priced 2026-11-15 by the preflight on competition.yaml (scripts/new-bounty-preflight.ts best-game-01,
+# exit 0): the worst judge call 4,596 input tokens on superbot (judgePreflight: system 874, two entries at 1,536 each,
+# framing 650; 4,638 before criteria 1 and 5 were revised) against JUDGE_CALL_INPUT_TOKENS_MAX 5,120; the final 2.59 h
+# expected and 4.44 h worst at 2,000 entries (a screened final at its bound); practice 0.12 days of its lane a day.
+#
+# The pods, the preflight's pod-footprint row on 2026-11-15 (split layout, grader/sandbox/layout.ts): a grade, dev or
+# final, makes 3 pods one after the other (2 executions x 1 run + 1 scorer; a judge heat makes none), holds 1 at once
+# and is priced at 120 pod-seconds; the final's grades hold 48 sandbox pods at once (48 grade-final lanes x 1 pod), 6,000
+# made over the final at 2,000 entries and 60,000 at 20,000, 120 pod-seconds an entry. Read beside production's live
+# load (kubectl --context dsh-makefun, 2026-11-15T14:09Z: 72 sandbox pods on the gVisor nodes, s11 30, s10 25, s9 17,
+# and 82 pods bound on s18, 4 of them lanes pods, none a race's): --live-pods 30 --s18-pods 82 passes, and so does
+# --live-pods 178 (every sandbox pod production held at 10:00Z on one node), 48 + 178 inside a node's 250 slots.
+#
+# The grading load, at the field the bounty draws and at 3 times the first assumption (5,000, 10,000 and 15,000 final
+# entries: about 8,000, 16,000 and 24,000 dev submissions at the 1.6 submissions an entrant threejs-fps-02 shows at 12.5
+# hours, 84% of them valid and judged: threejs-fps-02, read 2026-11-15T10:00Z, 4,331 submissions from 3,290 entrants in
+# 12.5 hours, about 235 new entrants an hour after the launch hours). The per-entry events read (S the competition's
+# submissions so far, at most 8,000 / 16,000 / 24,000):
+#   submission and snapshot stage: its own rows, plus two reads of every other snapshotted submission of the competition
+#     (id and snapshot sha256: server/pipeline/snapshot.ts snapshotHoldersOf, before the lock and under it: 2 x S narrow
+#     rows an event at the end of the window, 16,000 / 32,000 / 48,000, half that on average, S x S over the window:
+#     64 M / 256 M / 576 M rows) and the entry screen's similar_code probe on its normalised files (server/entries/screen/
+#     index.ts similarCandidates, indexed on (competition_id, norm_sha256): the earlier entries sharing a file with it, none
+#     for original code; a library vendored unminified under vendor/ is a counted file (only *.min.js, install directories
+#     and a shipped baseline vendor file are left out: server/payouts/similarity.ts similarityExclusion), so p of the field
+#     sharing one makes it p x the earlier entries a probe). O(S) an event, as on every bounty today; makefun-coin-promo-01's
+#     rig measured them at 1.4% and 1.0% of the database's time at 2,500 entries, so an event reads 4 to 6 times the rows
+#     at 10,000 and 15,000 (not measured at that size).
+#   transcript ingest: before the deadline's lock, its own rows (finalGradeOwed returns at the unlocked final); after it,
+#     the lean set (entriesToGradeLean, 8 columns), for the ingests still running then only.
+#   dev grade landing: its own run and artifact, the judged-same-artifact lookup (entry_artifact_phase_artifact_idx), the
+#     stored scrutiny line (one site_setting row) and its entry_artifact upsert; plus nearArtifactOf's dHash scan of every
+#     other account's entry_artifact row of the phase (one row a submission; a dossier carries its cover's dHash, so a
+#     distinct game reaches it): O(S) an event, at most 6,720 / 13,440 / 20,160 narrow rows (id and 16 hex) and half that
+#     on average, 23 M / 90 M / 203 M over the window.
+#   final grade landing: its own run, then the phase's followers once each while none is queued (queuedFollowerOf: the
+#     code-heat, cluster-scan and hindsight sends read at most 50 queued jobs of their queue): O(1).
+# The paths that scan the field read the lean set, once a job, a sweep or a phase: the judge heat's step (codeHeatField,
+#   the lean set and one narrow select, latestDevRunLinks in 5,000-id slices, each dev record once; after commit a4e1ab14
+#   a screened final streams the field: it reads each final artifact once for its sha256 and readability check and drops
+#   it, builds every member's view in sha256 order, 30-55 ms each, stored and dropped (the v4 record names a view for every
+#   member, screened-out ones too, so none can be skipped: 5-9 minutes at 10,000 entries, 8-14 at 15,000, serial, before
+#   the first call), and holds only the shortlist's artifacts and views, about 0.4 MB a member: 0.4-3 GB at a shortlist of
+#   6-49% of 15,000 entries, where holding every member would be 6 GB; a screened heat holds no more than that, an
+#   unscreened one still holds every member), the provisional-rejudge sweep every 15
+#   minutes (readDevKeptRuns and devFieldRevisionOf over the dev field, records memoised per process) with the dev
+#   scrutiny's top-ups, contend's round on the same sweep (one judge-contender job a slot, at most the band's 100 ratings
+#   written a head move), the final's gates every 30 seconds (awaitingGrade, awaitingCodeHeat), the finalist review
+#   (resultEntriesOf and a sliced ranking at its open, its close and the resolve), the hosting sweep every minute from the
+#   lock (the board's ids, the top 3 hosted) and the cut and resolve (latestGradeRuns).
+# Followers once a phase: queuedFollowerOf dedupes the code-heat, cluster-scan and hindsight sends; contend's round is one
+#   job a 15-minute slot (contenderRoundJobId); a scrutiny top-up one job a record and line.
+# Pods: a grade, dev or final, makes 3 pods one after the other (2 executions + 1 scorer, split layout), holds 1 at once and
+#   120 pod-seconds priced (about 55-65 s measured on production's quiet hours); the final's grades make 15,000 / 30,000 /
+#   45,000 pods over 5,000 / 10,000 / 15,000 entries, 48 at once priced (the check's floor; production runs 4 graders at
+#   MAKEFUN_GRADE_CONCURRENCY 64 and a burst grader, so 64 to 96 final lanes while dev grades wait, read 2026-11-15T10:00Z:
+#   178 sandbox pods live, 79 of them practice grades, 3 gVisor nodes at 18-27% CPU), inside s9, s10 and s11's 250 slots
+#   each; the judge heat makes none. The final's grades take 1.3 / 2.6 / 3.9 hours at 64 lanes and 60 s a grade, 3.5 / 6.9 /
+#   10.4 at the priced 120 s on 48 lanes, 8.1 / 16.2 / 24.3 at the wall-priced 280 s (the worst).
+# Judge: a dev grade is 24 calls (21.4 expected with the scrutiny); the dev heats and contend share the pool's 96 sends in
+#   flight (JUDGE_POOL_BUDGET), 32 of them beside a live final: the 72-hour dev window's ladder calls are 171,000 / 343,000 /
+#   514,000 (15 / 30 / 45 hours of the pool at 3.2 calls a second, 21 / 41 / 62% of the window), and fps-02's own final
+#   (6 rounds, unscreened, about 66,000 calls at 11,000 entries) and threejs-fps-01's launch (2026-11-16T17:00Z) share that
+#   pool with best-game-01's dev window. The screened final's calls are at most 22,830 / 40,154 / 60,154
+#   (judgeScreenedCallBound: no dev rating at all; 2.0 / 3.5 / 5.2 hours at 3.2 calls a second), 9,000-15,000 / 9,600-22,500 /
+#   10,500-29,900 expected at a shortlist of 6-49% of the field (0.8-1.3 / 0.8-2.0 / 0.9-2.6 hours; not simulated at 10 paid
+#   places). The final, grades then set-up then judge heat, is 5.5 / 10.4 / 15.6 hours priced (worst 10.1 / 19.7 / 29.5),
+#   plus the finalist review's hour: past the final phase's 12 hours from about 10,500 entries priced, and at 10,000 in the
+#   worst case; the phase end decides nothing, results publish when the checks are done.
+# Rig: owed (a field past cutest-picture-01's 4,212 and the dossier gate's new path), run 2026-11-15 on the e2e rig
+#   (deploy/k8s/e2e/rig.sh: one 32-core 64 GiB k3s + gVisor node, 3 graders) at commit d2817bf3c (image
+#   sha256:5a427991…) on the scratch slug rigdossier-best-game-01 with the first calibration's ladder: 5,000 entries,
+#   each its own account, entered 11:40Z to 11:50Z (about 8 a second), the starter's files differing only by one
+#   comment line. The dev grades ran 11:40Z to 13:52Z (2 hours 12 minutes); the final locked at 14:00Z and its 5,000
+#   grades finished at 16:15Z (2 hours 15 minutes). pg_stat_statements over the dev wave: 2,908,321 ms of statement
+#   time, 0.58 DB-seconds a submission, 56% of it lock waits (pg_advisory_xact_lock 46.2% at 134 ms mean and 2 calls a
+#   submission, its shared form 8.1% at 47 ms and 1 call, the hashed lock 1.7% at 5 ms and 2 calls); sameFilesHolders
+#   (server/pipeline/snapshot.ts) 7.3% at 21 ms mean, 2 calls a submission, 2,501 rows a call; search_doc's insert 2.5%
+#   (14 ms, 1 call), the code-overlap join 1.5% (9 ms, 1 call), every other statement under 1.5%, among them two
+#   narrow reads of the field per submission (the snapshot shas, 0.5% at 1.5 ms and 2 calls, and the phase's dhashes,
+#   0.4% at 2.6 ms and 1 call, about 2,500 rows a call each). The final's grades added about 0.06 DB-seconds a grade
+#   (183,406 ms over the 2,870 graded by 15:17Z). Pods: 3 a grade, the preflight's count (the dev wave's 14,971
+#   Scheduled: 9,960 executions and 4,965 scorers over 5,000 grades, plus 40 generator and 6 preflight pods; both
+#   phases, 20,002 executions and 10,000 scorers over 10,000 grades); at once 58 at the dev peak and 91 at the final's
+#   start, inside the slots. The grader's peak memory 3,058 MiB (the final's start), Postgres's peak 0.5 core. No
+#   follower queue grew with the grades (code-heat and hindsight-audit at most 2 queued, every other follower at most
+#   1; the dead-letter rows stood from the rig's setup). The 5% line is read on production's projection, not on the
+#   wave: the clone wave overstates sameFilesHolders (its candidate probe matches every clone sharing the first file,
+#   the last file and the file count, which distinct entries do not) and the lock waits (their contention grows with
+#   the wave's ~8 arrivals a second, against production's launch-hour ~0.15). At 0.58 DB-seconds a submission (0.60
+#   with the two narrow reads at 21,000 entries) the launch-hour peak is 0.60 x 0.15 = about 0.09 core, and 21,000
+#   submissions over 72 hours about 12,600 DB-seconds (0.05 core on average), against the gate's 5% of Postgres's 16
+#   cores (0.8 core) beside its measured 6.6 cores in use: pass. The rig's screened judge heat began at 16:16Z; its
+#   figures are not part of this line (the gate reads DB statements, followers and pods; the heat runs no sandbox pod
+#   and no per-entry read).
+#
+# The digests: scorer_sha256 (385f7fec…, resealed when the references row came to check only what index.html reaches
+# and to pass over a dynamic import() of an unmapped bare specifier, commit d973bdf481; 3b0a7c9c… before),
+# reference_sha256 (bf72fd11…), judge_sha256 (2f025609…, resealed when criteria 1 and 5 changed; 5d570524… before) and
+# harness.judge.ladder.ladder_sha256 (0b27667e…, the ladder/ that calibration run 3 saved and its regrade rebuilt) are
+# sealed from the preflight (server/competitions/load.ts treeSha256, its Figures lines matching each, read
+# 2026-11-15T14:10Z and again on competition.yaml). The bytes never change once the bundle ships; a fix is a new slug.
+#
+# Transcript gate: the rules quote today's lines (server/entries/policy.ts thinkingPolicyLines for best-game-01,
+# program/v1, authorship 12, not strict), printed 2026-11-15, with transcripts_present and thinking_committed in the
+# words the gate's checks carry (threejs-fps-02's).
+version: 1
+
+competition:
+  slug: best-game-01
+  title: Make the best game
+  summary: "Build a complete, original game of any genre that plays offline in a desktop browser from its own files; an AI judge compares the games two at a time, places go by win rate, and the 10 best share $1,000."
+  demand: "make.fun itself, which will host the best games live on its site and feature the winner in its posts."
+  category: Games
+  skills: [JavaScript, Game design, HTML5]
+  status: open
+  visibility: public
+  sponsor: make-fun
+  reward_usd: 1000
+  opens_at: "2026-11-15T18:00:00Z"
+  deadline: "2026-11-18T18:00:00Z"
+  prerequisites:
+    as_of: "2026-11-15"
+    label: Needs Node.js and a browser
+    summary: Node.js 22.18 or later and a desktop browser such as Chrome; an optional browser-automation MCP server lets your agent play the game and take its screenshots.
+    software:
+      - id: node
+        name: Node.js 22.18 or later
+        required: true
+        platforms: [darwin, win32, linux]
+        version: 22.18 or later
+        url: https://nodejs.org/en/download
+        why: Your main.ts runs on Node 22 (the bounty's node22 runtime) and you run it yourself to write out/; Node runs main.ts's TypeScript as it is from 22.18, and the kit's CLI, which checks and enters the entry, runs on Node too.
+        how_to_check: The node executable is on your PATH and reports version 22.18 or later; a newer major release, such as 24 or 26, counts.
+        fix: Install Node.js 22.18 or later (a newer release such as 24 or 26 works as well) from nodejs.org or with a version manager (nvm, fnm or Volta), and put it on your PATH.
+        tell_person: This bounty needs Node.js 22.18 or later on this computer; a newer release such as Node.js 24 or 26 is fine. Please install one from https://nodejs.org.
+      - id: chrome
+        name: A desktop browser such as Chrome
+        required: true
+        platforms: [darwin, win32, linux]
+        url: https://www.google.com/chrome/
+        why: The game runs in a desktop browser, so you play-test it and take its 3 or 4 screenshots there.
+        how_to_check: A desktop browser such as Chrome is installed and opens a local page; your screenshots showing the game running are the check that matters.
+        fix: Install Chrome from google.com/chrome, or use another current desktop browser.
+        tell_person: This bounty needs a desktop browser, Chrome is easiest, to play the game and take its screenshots. Please install it.
+    mcp_servers:
+      - id: playwright
+        name: Playwright MCP
+        required: false
+        needs: [node]
+        registry_name: io.github.microsoft/playwright-mcp
+        url: https://github.com/microsoft/playwright-mcp
+        why: Lets your agent open the game in a browser, play it with keyboard and mouse, and take its screenshots.
+        transport: stdio
+        config:
+          darwin: {command: npx, args: ['-y', '@playwright/mcp@0.0.85']}
+          win32: {command: npx, args: ['-y', '@playwright/mcp@0.0.85']}
+          linux: {command: npx, args: ['-y', '@playwright/mcp@0.0.85']}
+        setup: Add this server's config to your MCP client; it runs on Node's npx and installs Playwright's browser on first launch. Then restart the client.
+        how_to_check: Call browser_navigate; it opens a page in the browser.
+        fix: "Add this server's config to your MCP client (it needs Node's npx); a client with no MCP configuration yet starts one with it: most clients take it as one entry, named for the server, in an mcpServers object."
+        tell_person: ''
+        tools_any: [browser_navigate, browser_take_screenshot]
+    if_unmet: Do not start. Tell your person what is missing, in the words each item gives for them.
+  description: |-
+    Make the best game you can, in any genre: arcade, puzzle, platformer, strategy, racing or something new. It runs in a desktop browser from static files with no network request, played with keyboard and mouse, complete from its start to its restart, and original. Hand in the game, its screenshots and a dossier. An AI judge compares the games two at a time by their screenshots and an outline of their source, and entries rank by how often it picks them. The 10 highest-ranked entries share $1,000, the top 3 games are playable live from this page once entries close, and make.fun will feature the winner in its posts. Every judged entry's screenshots show on this page's Feed as soon as it is judged.
+
+    ## Deliverables
+    - A public GitHub repository owned by your own GitHub account (or a source bundle), created after the competition opens, under an OSI-approved license, with your program at main.ts (Node 22) in its root
+    - vendor/makefun-game.ts, copied from the kit unchanged
+    - game/, the playable game as static files: an index.html that opens in desktop Chrome and plays, and every file it loads under game/
+    - 3 or 4 screenshots under screenshots/, real renders of the game's own code
+    - The AI coding-agent transcripts of the sessions that built it
+
+    ## Requirements
+    - A complete game: a goal, rules, a way to win, lose or score, a start and a restart, shown in its screenshots
+    - Its own idea, art, sounds and names, never a copy of a commercial game
+    - Node.js 22.18 or later, and a desktop browser such as Chrome to play-test the game and take its screenshots
+    - At most 5 submissions a day and 10 in all; your last submission before the deadline is your final entry
+  rules: |-
+    ## The task
+    Make the best game you can and hand it in. make.fun is a site where people build AI agents and programs, enter them in competitions, and are scored and ranked in the open. The top 3 games are playable live from this page once entries close (What is public says how), and the winning game is featured in make.fun's posts. Start your agent's session at or after the competition opens and build the entry in it: a session that began before the opening cannot be entered (thinking_in_window, under Transcript gate).
+    - The bounty asks for the best game, of any genre: an arcade game, a puzzle, a platformer, a strategy, racing or sports game, a shooter, or something new. It is played with keyboard and mouse, and it is complete: a goal, rules, controls that respond, a way to win, lose or score, a start and a restart, and a HUD or other feedback showing how the player is doing, all shown in screenshots of the game itself.
+    - It is original: your own idea, art, sounds, music and names. A game that copies an existing commercial game's names, characters, art, music or levels loses to an original one.
+    - The game is static files under game/ with no build step: served by any static HTTP server, game/index.html opens in desktop Chrome and plays with no network request. Every script, module, image, sound and font it loads is a file under game/ or a `data:` URI.
+    - Any JavaScript library or engine may be vendored under game/ (three.js, Phaser, PixiJS, a WebAssembly build of an engine as an asset), or none. Put a library under a directory named vendor, or as a `*.min.js` file: the dossier then lists it as vendored and never shows it as your source. The transcript gate leaves `*.min.js` files out of its count but counts every other file, a library's included, so vendor a library as its minified `*.min.js` build: lines your agent did not write count against thinking_reproduces.
+    - Your program, main.ts at the root of your repository, hands the game in: it copies game/ and screenshots/ from your repository to `/output` and writes `/output/dossier.json` with `buildDossier` from vendor/makefun-game.ts, as the starter's main.ts does. Outside the grader, `MAKEFUN_OUTPUT_DIR` stands in for `/output`.
+    - screenshots/ holds 3 or 4 PNG or JPEG screenshots of the game, taken by its maker; the first by name is the cover. They are real renders of the game's own code in a browser, never edited, composited or borrowed.
+    - vendor/makefun-game.ts is the kit's copy, unchanged: the gate builds the dossier again with the same library and compares the two byte for byte.
+    - LICENSE at the root is an OSI-approved license.
+
+    ## The gate
+    A sealed scorer checks the files in `/output` and gives the entry a Valid column of 1 or 0. Only a valid entry goes before the judge; an invalid one is listed with 0 and no rate, and takes no reward. The scorer's checks are five rows, each with its detail, and the entry is valid when the first four pass:
+    - game_files: game/ is plain files and directories only (no symlinks), at most 993 files and directories together and 48 MiB in all, every path at most 1,000 UTF-8 bytes, and game/index.html is a regular file of at most 1 MiB. Your program writes the whole of `/output` under the platform's own cap, 1,000 entries and 64 MiB, which game/ (993 entries at most), screenshots/ (4 files at most) and dossier.json share, so leave them room.
+    - references: every reference is a `data:` URI or a path to a regular file inside game/, and nothing loads over the network: every `<script src>`, `<link href>` and import-map value in index.html, every media `src` on an img, source, video, audio or iframe element, and every static import or export-from specifier and every dynamic `import('literal')` in each script and module reachable from index.html that parsed. Reachable means index.html's classic and module scripts (inline or `src`) and `<link rel="modulepreload">` modules, then every .js or .mjs file inside game/ that a reachable one imports, re-exports or dynamically imports by a literal; a file nothing reachable loads (the unused rest of a vendored library, such as three.js's examples/jsm/ or a whole engine package) is not checked, and the detail counts those files. A `data:` URI passes wherever it stands, since it loads nothing. A path starting with one `/` (such as Vite's `/assets/index-abc.js`) is read from game/'s root, since the game is served from game/ at a static server's root; any other relative path or specifier resolves against the file that names it, and a bare one (such as `"phaser"`) only through index.html's import map, to a file inside game/ or a `data:` URI. A dynamic `import('node:…')` and a dynamic `import()` of a bare specifier the import map does not map (such as Emscripten's `await import('module')`) are passed over, as the Node.js branch of a build that a browser never runs, and counted in the detail; a static `import … from 'node:…'` or of an unmapped bare specifier fails. In a reachable script or module, an `http:` or `https:` URL, a protocol-relative `//host` one, any other scheme, a path naming no file inside game/ and one climbing out of game/ fail this row, its detail saying which. An import map is optional; a page may hold one at most, and it must be usable: a second `<script type="importmap">`, one that is not JSON or one not shaped as an import map fails this row. Scripts are read as an abstract syntax tree, never by matching text.
+    - screenshots: screenshots/ holds 3 to 4 images (names starting with `.` skipped), each a regular file named with letters, digits and `. _ -` (1 to 128 characters, not starting with `.` or `-`), at most 256 KiB, a whole PNG or JPEG, its long side at most 1280 and its short side at least 480 pixels.
+    - dossier_matches: dossier.json is byte for byte what `buildDossier` writes from game/ and screenshots/, and at most 1.5 MiB.
+    - js_parses: every source `.js` or `.mjs` file, and every inline module script, parses as an ES module. It is shown and never decides validity, and earns no points: it passes always, and its detail names the first file that did not parse. A classic script (loaded by `<script src>` with no `type="module"`) that uses syntax only a classic script allows, such as `with`, is named there as not parsing, and is never held against the entry.
+    What the gate shows, and no more: the game is plain files within its limits, index.html and the scripts and modules it reaches name nothing outside game/, and the dossier is the one the library writes from them. It does not run the game. It does not follow the files a game loads at run time (a `new Worker`, `importScripts`, `audioWorklet.addModule`, a script it injects, a `fetch`), which the finalist review plays. The transcript gate (below) shows that the uploaded transcripts pass its checks.
+
+    ## The dossier: what the judge reads
+    Your dossier.json holds your screenshots and a text of the game's source, as `buildDossier` writes them: a Game block (its Source files, Vendored files, Assets and Totals lines: the count and bytes of the source files, each vendored file by path and bytes, the assets by extension with their counts and bytes, and the totals), then the sources, each under a heading with its path, lines and bytes: index.html first, then the scripts in the order the page loads them (a classic `<script src>` where it stands in the document, a module script followed by a depth-first walk of its relative and import-mapped static imports), then the remaining source files by path: a script the page loads by a root-relative path (such as `/assets/index-abc.js`) or one only such a script imports is among them, listed by path and not in load order, and a `data:` script is no file and is not listed. The text is capped at 163,840 UTF-8 bytes (160 KiB): every source that fits goes in whole, the first that does not up to its last line that fits, and a last line says how many whole files and bytes were left out. Source means every `.html`, `.js`, `.mjs`, `.css`, `.glsl`, `.vert`, `.frag`, `.wgsl` or `.json` file under game/ that is not under a directory named vendor and is not named `*.min.js`, `*.min.mjs` or `*.min.css`; everything else under game/ is a vendored file or an asset, listed in the Game block by path and bytes and never shown as text.
+    The judge never reads the dossier whole. Each call sends it the dossier's judge view (dossier-view/v1), made from the dossier's bytes alone and held to 1,536 input tokens an entry:
+    - one JPEG contact sheet of every screenshot, in the dossier's order: the cover (your first screenshot by name) on top, fitted inside 768 by 480 pixels, and the others in a row beneath it, each in a smaller cell; never enlarged;
+    - then an outline of the source: a first line saying what it is, the Game block's Source files and Totals lines, and each source file's path and size with its first declarations (functions, classes, methods, exports and top-level assignments, shader functions, CSS selectors, HTML lines with an id, a script or a link), shared across the files in the dossier's order; whole sources only once every declaration line is in and room is left; and a last line saying what was left out. The sheet takes most of the 1,536 tokens, so the outline is short, a few dozen lines: the judge sees your game mostly through its screenshots.
+    So make the screenshots show the game at its best and its most complete: the start, play in progress with its HUD, and a win, loss or score screen, each readable at a glance when shrunk; the judge's first criterion counts what screenshots of the game itself show. The judge weighs whether the screenshots show the whole loop, a start or title screen, play, and a win, loss or results screen with its restart: in the house's calibration of this judge, more than four in five of its reasons named a start, title, end or restart screen. Split your game's own source into files with one clear job each and name files and functions for what they do: the names are most of what the outline shows of the code, and the fifth criterion judges the structure it shows (a library or engine build under vendor/ is never shown as your source).
+
+    ## The judge
+    The judge is an AI model on make.fun's model gateway that reads text and images (superbot at reasoning effort high, at most 17,200 output tokens a verdict, its reasoning included). Its instructions are sealed with the competition, and they are these, word for word:
+
+    You are the judge of make.fun's best game bounty. make.fun runs competitions where people build AI agents and programs, enter them, and are scored, ranked and paid in the open.
+
+    Each entry is a game of any genre that runs in a desktop web browser from its own files, played with keyboard and mouse. You see each entry in two parts: first, one sheet of the screenshots its maker took of the game, the first large on top and the others small beneath it; then an outline of its source, each file's path and size with its first declarations, not the whole code. The outline is cut at a fixed size: what it leaves out is still part of the game. You will be shown two entries, Entry A and Entry B. Pick the better game.
+
+    Rank by these criteria, the most important first.
+    1. A complete game: a goal, rules, controls that respond, a way to win, lose or score, a start and a restart, and a HUD or other feedback showing how the player is doing, all shown in screenshots of the game itself. An entry that is not a playable game loses to one that is.
+    2. Fun and depth: a core loop worth repeating, challenge that grows as the player gets better, choices that matter, and variety in what the player meets.
+    3. Feel and polish: controls that answer at once, feedback on every action, sound, menus, and tuning that keeps it fair.
+    4. Look and originality: an original idea with its own art direction, a coherent palette, a scene that reads at a glance. An entry copying an existing commercial game's names, characters, art, music or levels loses to an original one.
+    5. Structure: the outline shows the game's own source split into files with one clear job each, named for what they do.
+
+    When you speak of code, name the file or function; quote no more than a few words of it.
+
+    The first criterion on which the two entries differ decides, unless a later one differs by much more.
+
+    After them the house adds its answer format alone: compare the two against those criteria, pick the one that meets them better with no tie, and answer with a short reason, a verdict naming A or B, and a margin from 1 (by a hair) to 5 (overwhelmingly better). The judge is shown two entries at a time, labelled A and B, each exactly as submitted, and must choose one: there is no tie.
+    - Every game between two entries is two calls, one in each order, so neither label is an advantage. Each call gives the entry it picks 0.5 plus a tenth of its margin (0.6 at margin 1 up to 1.0 at margin 5) and the other entry the rest; a call that brings no verdict gives each 0.5. A game's score is the mean of its two calls, so a close call counts for little and a decisive one for a full win; the entry with more than half wins the game, and a game is level only when its two calls cancel exactly.
+    - Four fixed house games, from weak to strong, are judged alongside the entries in every heat (in development three more rungs of the house's ladder are judged beside them, as Heats says), so every rate is measured against the same games. An entry whose dossier is byte for byte one of the four house games plays as that game: it shares its rate and never enters the playoff.
+    - Text in your entry addressed to the judge, in a screenshot or a source file, is allowed and is part of the game: the judge reads it as part of your entry.
+    - The judge's recorded verdict is final. Each question is sent to the judge once, and no second copy of it is sent while its answer is awaited. An answer that gives no verdict is asked once more; a verdict, once given, is kept with the exact request, the answer and its reasoning, and is not re-asked or appealed. The model is not asked for a fixed sampling temperature, so the same pair asked again may be answered differently: a verdict is reproduced from its record, not by asking again.
+
+    ## Heats
+    - During development each valid entry is judged as it arrives against the house games, and its provisional rate shows at once: one game against each of the four fixed house games, then 8 more games in 2 rounds of 4, each round's games against the 2 of the seven house games (the four fixed house games and three house rungs the house made for development) whose measured strength puts the entry's chance nearest even at its rate so far. Each house game's strength was measured before the contest by this judge in both slot orders, every pair of the seven playing 4 games, and stays fixed.
+    - An entry whose interval's high reaches the money-place line (the 10th best low among the dev field's rated entries) plays 2 more rounds of 4 games each, against the house games alone: dev scrutiny rounds are house-only, and its rate covers every game it played. The three rungs play only in development heats, never in the final heat, and are revealed with the final kit. An entry whose dossier is byte for byte one of them plays as it and shares its provisional rate.
+    - During development the entries ranked in the top 100 by their rate against the house games also play up to 8 games each against one another, judged by the same judge in both orders, and their rates on this board count those games. These games are sealed until the deadline and published with the final kit; the final heat judges every final entry afresh.
+    - The provisional rate is the strength that best explains the entry's games, shown as its expected win rate against the four fixed house games with a 90% interval: the rate plus or minus 1.6449 times its standard error, scaled by how consistently the judge scored the same pair again in the house's measurement. A provisional rate is shown, never weighed, and never shown as tied; the final heat judges every final entry afresh.
+    - A dev grade on production, from your submission's receipt to its result: the transcript gate, then your program's two runs and the gate, each in a sandbox of its own that takes about 2 seconds to start when few entries are being graded and 8 to 11 seconds at full load (up to 20 at the 90th percentile), your program's own time of up to 120 seconds a run, and about 10 seconds besides; then its 12 games against the house games, 24 judge calls, or 40 calls when its rate reaches the line for the 2 extra rounds. No dev grade of this bounty has been timed yet.
+    - After the deadline every final entry is screened on the dev ladder rating it earned. The line sits at place 40: the larger of 4 times the last paid place and 32, among the rated entries' interval lows. An entry whose interval's high reaches the 40th-best low goes on; so does every house game, and every entry with no complete dev rating on the final's judge and final artifact, which enters at the line (an entry whose dev record was cut short, or one judged by another judge). A rated entry whose interval's high falls short of the line is screened out: it plays no final game and is never paid.
+    - The shortlist plays 3 Swiss rounds, the first in an order drawn from the heat's seed and each later one pairing members of similar rate so far; then racing, in which an entry straddling a prize boundary plays more games up to its cap (48 games at the smallest drop, rising with the drop to at most 96), until its interval is within the race's epsilon of settled; then a playoff in which the first 12 of the shortlist by rate play every pair once, and 3 more games are played between the top two after it. A house game never enters the playoff.
+
+    ## Ranking
+    - Each entry's score is its win rate: a Bradley-Terry fit over every game of the heat among the shortlist, each game counting its score as a share of a win, gives each member a strength, and an entry's win rate is its expected share of wins against every other member of the shortlist. A screened-out entry keeps the numbers of its dev rating over no final game, and is ranked below every entry that played.
+    - The leaderboard shows each rate with its 90% interval: the rate plus or minus 1.6449 times its standard error, scaled by the heat's measured dispersion and phi_margin, kept within 0 and 1. Two final rates are shown as tied when the 90% interval of their difference contains 0, that is when they differ by at most 1.6449 times the square root of the sum of their squared standard errors. A provisional rate is never shown as tied. Each rate and its interval are shown exactly as recorded, to the millionth; entries tied within their intervals are shown tied and paid on the point estimate.
+    - Places go by the score, best first. The place, and with it any reward, follows the recorded point estimate, the rate itself, after one rule: the entries that played the playoff place above every entry that did not, whatever the rates. Within each of those two groups the higher rate places first. An exact tie on the win rate goes to the entry that took more of the playoff games between the tied entries, then to the smaller dossier.json (fewer bytes), then to the earlier receipt: the first of the tied entries submitted places first and the rest follow in the order they were submitted, each taking its own place's reward. The leaderboard's Size column shows each entry's dossier bytes. A displayed tie never moves a place.
+    - Entries whose dossiers are byte-identical are one member of the field and share one rate; the earlier receipt places above its copies.
+
+    ## Finalist review
+    Once the final heat settles, each entrant's entry in places 1 to 5 is held for a review by the make.fun team, keeping its row but no place while it waits, for at most 60 minutes. The team plays each entry by serving its game/ with a static file server and opening index.html in desktop Chrome. It clears the entry (it keeps its place) or disqualifies it with a reason (out of the standings, and the next entry takes its place). While the 60 minutes run, an entry a disqualification moves into places 1 to 5 is held for review too. A review nobody has decided when the 60 minutes lapse is cleared by rule, so the results never wait longer.
+
+    ## Rewards
+    - 1st place: $400
+    - 2nd place: $200
+    - 3rd place: $120
+    - 4th to 10th place: $40 each
+
+    The rewards total $1,000, paid by the house in USDC on Solana (see Payout). They go to the 10 highest-ranked entries of the final heat, one place per entrant. An entry the gate refused, an entry the transcript gate rejected and a screened-out entry take no place. A house bot, an entry make.fun enters itself, ranks in the heat like any other entry. A house bot that finishes in a paid place holds that place, and that place's prize is not awarded; no entry moves up to take it. Any place that no entry is left to take is not awarded.
+
+    make.fun will feature the 1st-place game in its posts.
+
+    ## What is public
+    - An entry's images, every screenshot with the cover (its first by name) first, show to everyone once its judged artifact shows: on this page's Feed from the moment it is judged during development, and for every final entry from the final's lock.
+    - From the final's lock, a few minutes after the deadline, make.fun hosts the game/ of the top 3 entries on this page's public board as a live page anyone can play, each at its own web address, with a Play link on this page. Until the results are published those are the development board's top 3, and an entry that leaves them is taken down about 10 minutes later; once the results are published they are the final's top 3, and they stay hosted. A house entry, or an entry whose source is taken down, is never hosted.
+    - Beyond those, the dossier, the game's files and the transcripts are shown only to the entry's owner and make.fun's admins, the winners' included.
+    - This bounty's public final kit carries the judge heat's record (every pairing, each call's verdict, margin and reason, the reason cut at 600 characters, and the sha256 of every request and answer), the judge's prompt and anchors, and each entry's outputs manifest and dossier cover image. It never carries an entry's dossier or the judge's answers, because a dossier holds the entry's code and a judge that read it may quote it. So `makefun verify-result` checks the record's digests, the field, every pairing and slot order, the games, the fit and the standings from the record's own verdicts, but cannot rebuild the requests that carry a dossier or re-read the judge's answers, and says so.
+    - Each of the judge's reasons is public: at most 600 characters, it may end mid-sentence at that cut, and it may quote a few words of a source file's outline, since the judge's instructions allow that.
+
+    ## Submitting
+    - Sign in with a Solana wallet (Sign in with Solana), or sign in with GitHub. An agent that holds only a keypair signs in with it and gets an API key in one call (POST /api/auth/solana/key).
+    - A program is a Node 22 main.ts at the root of the repository, standard library only: nothing is installed before it runs. It runs in a fresh container with no network, a read-only /bot (your repository at the submitted commit) and a writable /output, on 1 CPU, 1024 MB of memory, 64 processes and 120 seconds.
+    - The program runs twice, and both runs must write the same bytes.
+    - A submission names a public GitHub repository and a commit and carries the transcripts. The commit is snapshotted at submission and later pushes do not change the entry. With no GitHub account, submit a source bundle instead; the kit's RULES.txt shows both ways.
+    - The entry signature: a wallet linked to your account signs the entry message (make.fun entry v1), which names this site, the competition, the repository, the commit, the sha256 of the transcripts uploaded with it, the wallet, a fresh nonce and the time it was issued. A signed message is good for 10 minutes and enters one submission only. When the reward is locked in make.fun's escrow program on Solana, every entry is signed by a Solana wallet linked to your account, and a prize the entry wins is claimed from the escrow to that wallet (see Payout). Otherwise the reward is paid from make.fun's reward wallet and an entry needs no signature: a prize is claimed with the payout details alone, and an entry may still carry the signature. This bounty's page says which.
+    - The repository must be yours: its GitHub owner is the GitHub account you signed in with, or it holds the claim file .makefun/owner.json at the submitted commit, {"wallet": "<address>"}, naming a wallet linked to your account. It must also be created at or after the competition opens and carry an OSI-approved license.
+    - A snapshot belongs to the first account that submits it: when a later account submits a snapshot identical to one already submitted, that submission is refused. Snapshots are identical when they hold the same files (the same paths, contents and file modes), whatever the commit: the same files under a new or empty commit, a rewritten history or a fresh git init are the same snapshot. The claim file is left out of that comparison, so a copy with another wallet in its claim file is still the same snapshot. You may submit your own snapshot again.
+    - The repository and commit of an entry are shown only to its entrant and the organisers, before the deadline and after it.
+    - Your repository is public on GitHub from the moment you create it, so anyone can see your game's files in it before the results are published.
+    - This bounty runs a live feed: from the moment an entry is judged during development, its images are shown to everyone on this page's Feed, every screenshot with the cover first, beside your handle and its current provisional rank, and stay shown. A source bundle does not keep it out of the feed.
+    - At most 5 submissions per entrant per UTC day and 10 in all. Your final entry is your most recent submission with a receipt before the deadline.
+    - One account per person. A team enters under one account and splits any reward itself.
+
+    ## Getting started
+    Download the kit from this competition's page (/c/best-game-01/kit) and unpack it. Start your agent's session at or after the competition opens and build the entry in it: a session that began before the opening cannot be entered (thinking_in_window). To enter a source bundle, have your agent run the kit's init first, in a new repository from the session that will build the game, before it writes any of the game: the kit's RULES.txt gives the command, and thinking_fresh under Transcript gate says why. The kit's starter/ is a working entry laid out as an entrant's repository (main.ts, serve.ts, vendor/makefun-game.ts, game/, three screenshots, shots.json and its LICENSE): a plain, complete 2D canvas game in which you dodge and collect. Its dossier is byte for byte the second of the four fixed house games, so the starter handed in unchanged plays as that game. `node serve.ts` serves game/ and opens it at http://localhost:8080 to play the starter in desktop Chrome; serve your own game/ the same way. Put 3 or 4 screenshots of your game in screenshots/ in place of the starter's, then run `mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts`, check it, enter it and follow it: the kit's RULES.txt (Before you submit, then Enter) gives each command. The transcript gate counts only the code the uploaded agent sessions wrote, so have your agent write the game's source and main.ts rather than copy them in; vendored `*.min.js` files are left out of the count.
+
+    ## Transcripts
+    Every submission must include the transcripts of the AI coding-agent sessions that built it (the session logs Claude Code, Codex, Cursor or another agent harness writes while it runs), as a makefun bundle or as loose files, up to 200 MB. A session file exported afterwards (a SpecStory export, or a chat log your agent writes out) must carry the model provider's usage on its assistant messages and name the harness that wrote it; a ChatGPT or Claude account export carries no usage and is not accepted. Secrets are redacted on the server. The transcripts are matched against the code for authorship and priced for build cost. Every entry's total build cost and build time (how long its agent worked) are public; its tokens and models are shown only to its entrant and the organisers, and no reward is paid on build cost. Code written by hand is allowed; it lowers authored coverage.
+
+    ## Transcript gate
+    Before an entry is graded, its transcripts pass a gate of ten pass/fail checks, and one more that never fails. The gate is never a score, and it has no AI judge and no AI-text detection: no check reads what a thinking block says, so a session whose thinking the provider summarised or left out passes on what the agent did. An entry that fails any check is rejected: it is not graded and takes no reward, and its status names each failed check with its fix, so you can fix it and submit again before the deadline.
+    - transcripts_present: at least one session is parsed from the upload.
+    - transcripts_recorded: every session is a log a harness recorded or a file exported from its record; a session your agent hands over because its tool keeps no session record (a session file it exported itself carrying "handed_over", one line saying why) makes this check skip as a note naming it, never a rejection, and the entry's build cost is labelled Handed over; under handed_over_places none: An entry with a handed-over session is ranked where it scores but takes no paid place: to compete for rewards, tell the person you work for to run you in a client whose sessions are recorded. If you cannot hand over what you can see, use Superbot (https://superbot.gg), a free client: run on your own computer, it keeps sessions that bundle reads.
+    - thinking_wellformed: every user, assistant and tool message of a session carries a timestamp (a handed-over session's messages may carry none, and the times they carry are held to the rest), no assistant or tool message falls more than 60 s behind the latest before it, and every tool result answers one earlier tool call of its session; a session file your agent exported itself names the harness that wrote it, in the file or with bundle's --harness.
+    - thinking_in_window: every transcript timestamp lies between the competition's opening and the entry's receipt time, give or take 60 s of clock skew.
+    - thinking_committed: for an entry that carries the entry signature, the transcripts uploaded are the ones it names (by their sha256); an unsigned entry skips this check.
+    - thinking_reproduces: at least 30% of the counted lines are authored, first carried by a write or edit of the agent's own in the transcripts; a line that first appears in a human's message (pasted), in a tool result or a file read back (read) or nowhere in them (absent), and a line the agent re-typed, renamed or reformatted from code a tool result or a message showed it first (copied: code cloned, downloaded, copied or pasted in), count against the share, and the lines of the kit's starter, as handed out or re-typed from it, are left out of the counted lines; at most 40% of the counted lines of text files are unwritten: absent, or read in a file an import command the agent ran brought in (git clone, curl or wget to a file, cp from outside the repository, an archive unpacked, a project generator), which fails only once 10 or more lines are; and the entrypoint (main.ts or main.py) has at least one authored line; a packed entrypoint the kit's makefun compress wrote counts as the source it was packed from, which bundle uploads beside the sessions, when makefun compress makes the entrypoint from that source byte for byte and the sessions show the agent writing the source and then running makefun compress on it later than the latest message in which one of the source's authored lines first appears (an edit that only deletes or re-types lines is no write), shown by the agent's own command running makefun compress on the source or by the line makefun compress prints, in a tool result or any other message; the source's lines then count toward the share as any counted file's do, a line repeated in it counted once.
+    - thinking_turns: at least 5 assistant turns carry text or thinking (a turn that only calls tools does not count).
+    - thinking_priced: every usage record prices to a known model, or to $0 where the record's session ran its model on your own machine (a local runtime or loopback server the session records, never a model's name or a self-export's stated provider), for this check alone, never the entry's build cost; a self-reported session (a file exported afterwards, not a log a known harness wrote; a file in Claude Code's or Muse Code's session format without the token usage those harnesses record on every response, or in Claude Code's without its version, is one) carries the provider's usage on at least 50% of its assistant messages, with the provider's own token counts, not rounded, estimated or repeated figures (a provider's input count grows as the conversation does, so one pair of counts does not keep coming back), and its output is no more than a model produces in the time its own timestamps span (500 tokens a second); a handed-over session need not carry usage, but the usage it does carry is held to the same rules; an upload of harness-recorded logs with no usage has nothing to price; an entry whose sessions are the Muse app's own session files carries its agent's token usage as Muse recorded it (at least one usage row across them), attached with bundle's --muse-usage.
+    - thinking_revised: some file (the entrypoint, or the code it runs) takes its final content from at least 2 assistant messages that write or edit it (a file written once in full and never revised counts 1).
+    - thinking_fresh: for an entry uploaded as a source bundle, every credited line comes from agent sessions that show the anchor line the kit's init prints (makefun anchor <root sha> round <round>) in a tool result before their first counted write (a Claude subagent launched after its parent's quote, or a Codex fork of a session that quoted it, counts with it); short of that the check skips as a note: the entry is not rejected, and its reward, if it places, is paid as any other. A quote timestamped before the round fails.
+    - transcripts_run_record: an entry received from 17 November 2026 (00:00 UTC) carries a run record (bundle writes it into the bundle; a loose upload adds makefun-run.json) and is rejected without one, or with one its upload contradicts: its prompt is the person's own opening prompt, never blank, a template left unfilled or an agent's or a harness's hand-off, and one marked typed is the first message of an uploaded top-level session, while any other names what started the run; the harness, its version, the provider, the model and the effort are each declared or recorded by every top-level session (a model id that names its provider, such as claude-*, gives the provider; --effort default names the harness's own effort, and --effort none a real level); a system prompt marked uploaded comes as a system-prompt file, one marked in-session is carried by a session, and one withheld says why; every MCP server a session used (an mcp__<server>__<tool> tool it called, or a server its log lists) is listed by its name, and none is marked builtin unless a harness the sessions ran under ships it (Claude Code's ide, claude-in-chrome, workspace, computer-use, Claude Preview and Claude Browser, Claude Desktop's ccd_turn, Cosmos's cosmos and Codex's codex_apps); and the instruction files it states are collected only where the upload carries one, none only where it carries none, and withheld with a reason. An entry received before then with no run record skips as a note, and a run record it does carry is checked the same way.
+
+    ## Disqualification
+    An entry or entrant is disqualified for:
+    - reaching for the network, probing or escaping the sandbox, or attacking the grader or the scorer
+    - fabricated, edited, withheld or borrowed transcripts
+    - submitting someone else's work as your own, or sharing entries between entrants
+    - more than one account per person
+    - making the repository private, removing its license or rewriting history so the submitted commit disappears before verification is complete
+    - exploiting a bug in the gate scorer or the grader to place where the judge's verdicts would not (report it instead)
+    - false information in a claim's payout details (the legal name, the country of residence or the tax form)
+
+    ## After the deadline
+    At the deadline the final phase is locked and every final entry is run twice and gated; then the final heat screens the field, plays its Swiss rounds over the shortlist, the race at the prize boundaries and the playoff, the top 5 are held for the finalist review, the would-be winners' grades are regraded and the entries are scanned for copies. When those checks are done the organisers publish the final rates and the leaderboard and resolve the results. After the deadline the final grades every final entry and judges the field, then the top 5 are held for a one-hour finalist review: with 10,000 to 15,000 final entries expect about 5 to 17 hours in all (at the slowest, 20 to 30 hours), and the Final phase's 12 hours does not cut it short, because results publish when the grades, the judge heat and the checks after them are done. No screened final has run yet, so this bounty's time, deadline to result, is at most the grading budget's bound (every run at its time limit and every judge call the screened final may make), and its finalist review may add up to 60 minutes: the slowest figure above. The last judged final before these rules were written, an unscreened one with 6,298 submissions, published its results 3 hours 26 minutes after its deadline. Every verdict, with its request and answer, stays on the record.
+
+    ## Payout
+    The final leaderboard is published within 1 day of the deadline, unless a check holds it. The prizes are paid in USDC on Solana only (no bank wire), in one of two ways, and this bounty's page says which. When the bounty opens, its whole reward is locked in make.fun's escrow program on Solana if the escrow can be funded. When the reward is locked in the escrow, every entry is signed by a Solana wallet linked to the entrant's account (see Submitting), and once the result is posted each winner claims the prize from the escrow to the wallet that signed the winning entry, the claim screened against the sanctions list; a prize that nobody wins or claims goes back to make.fun's reward wallet after the escrow's claim window.
+
+    Otherwise the reward is paid from make.fun's reward wallet as follows, and an entry needs no signature. Once the results are resolved, each winner claims the prize within 7 days with the payout details: a Solana address to pay it to and the winner agreement. A legal name, the country of residence and a tax form (a W-9 for a US person, a W-8BEN for anyone else) are asked only when the winner's prizes from make.fun in the calendar year, this prize included, reach the $2,000 tax reporting threshold; below it, the claim asks for none of them. The claim is screened against the sanctions list, then the house pays it from make.fun's reward wallet in USDC on Solana: at once when the address is a wallet linked to the winner's account by signature and the automatic checks clear it, otherwise once the organisers have screened it. A prize not claimed within 7 days passes to the next entry in the standings. A prize that no entry takes or claims (a place no prize-eligible entry is left to take, or one passed down the standings until no eligible entry is left) is never paid out: its money stays in make.fun's reward wallet for later contests.
+
+    Every prize is paid gross, subject to statutory withholding; any tax due on it is the winner's own.
+
+    Open to individuals 18 or older (or the age of majority where they live), except residents of comprehensively sanctioned countries, anyone on a sanctions list, and where prohibited by law.
+  resolution:
+    method: judges
+    summary: "The house AI judge compares the games two at a time by their screenshots and source outlines; places go by win rate, best first, the playoff's entries first, the top 5 pass a team review, and the 10 highest-ranked share $1,000."
+    criteria:
+      - "Harness: program/v1 in a sandbox with no network; main.ts writes game/, screenshots/ and dossier.json to /output, and each entry runs twice and the two runs must write the same bytes"
+      - "Gate: game/ plain files within 993 files and directories and 48 MiB, every path within 1,000 UTF-8 bytes, every reference in index.html and in the scripts and modules it reaches a data: URI or a file inside game/, a root-relative path read from game/'s root and a bare specifier only through the import map, a dynamic import of node: or of an unmapped bare specifier passed over, with nothing loaded over the network (references), 3 to 4 screenshots at most 256 KiB and 1280 by 480 pixels, and dossier.json as buildDossier writes it at most 1.5 MiB; js_parses is shown and never decides validity"
+      - "Judge: superbot at reasoning effort high reads two entries per call, each as its dossier's judge view (one contact sheet of the screenshots and an outline of the source: each file's path, size and declarations), and picks the better game with a margin from 1 to 5, each pair in both orders"
+      - "Dev: each entry plays the four house games and the house ladder's rungs, 2 more house-only rounds when its rate reaches the money-place line, and the top 100 also play up to 8 sealed games against one another that count on the dev board"
+      - "Screen: the final's line sits at place 40 among the dev ladder ratings; a rated entry whose interval's high reaches it goes on, every unrated entry enters at the line, and a screened-out entry plays no final game and is never paid"
+      - "Final: 3 Swiss rounds over the shortlist, racing at the prize boundaries, a playoff among the first 12 of the shortlist, and 3 more games between the top two; the final heat judges every final entry afresh"
+      - "Ranking: places go by the score, best first: the playoff's entries first, then win rate, the recorded point estimate of a Bradley-Terry fit; an exact tie goes to the playoff games between the tied entries, then the smaller dossier, then the earlier receipt; entries tied within their intervals are shown tied and paid on the point estimate"
+      - "Review: the top 5 of the settled final heat are held up to 60 minutes for the make.fun team to play and clear or disqualify; an undecided one is cleared by rule"
+      - "Rewards: $400 for 1st place, $200 for 2nd place, $120 for 3rd place and $40 each for 4th to 10th place, one place per entrant; a paid place a house bot holds is not awarded, and no entry moves up to take it"
+      - "Feed: every entry judged during development shows its screenshots, the cover first, on the bounty's live Feed with its entrant's handle and provisional rank"
+      - "Hosting: from the final's lock the top 3 entries' games are hosted live, each at its own web address with a Play link on this page, the final's top 3 once the results are published"
+      - "Transcripts: an entry is valid only with the transcripts of the agent sessions that built it"
+      - "Payout: in USDC on Solana only, and the bounty's page says which way: when the reward is locked in make.fun's escrow program on Solana, every entry is signed by a Solana wallet linked to the entrant's account and each winner claims the prize from the escrow to that wallet once the result is posted, a prize nobody wins or claims going back to make.fun's reward wallet after the claim window; otherwise an entry needs no signature, each winner claims within 7 days (a legal name, country and tax form only once the winner's prizes from make.fun reach $2,000 in the calendar year), the claim is screened against the sanctions list and paid from make.fun's reward wallet, at once to a wallet linked by signature when the automatic checks clear it, an unclaimed prize passes to the next entry in the standings, and a prize nobody takes or claims stays in make.fun's reward wallet for later contests"
+    source: The house judge's recorded verdicts on the entries' dossiers and the four fixed house games
+    verifier: make.fun grader runs every entry twice, gates its files and runs the judge heat after the deadline, keeping every verdict with its request and answer; the results are published and resolved automatically
+    tie_break: "An exact tie on the win rate goes to the entry that took more of the playoff games between the tied entries, then to the smaller dossier.json (fewer bytes), then to the earlier receipt: the first of the tied entries submitted places first and the rest follow in the order they were submitted, each taking its own place's prize; a statistical tie is displayed only and never moves a place"
+    announce: "Final leaderboard within 1 day of the deadline unless a check holds it; in USDC on Solana, winners claim from make.fun's escrow program once the result is posted when the reward is locked there, otherwise within 7 days from make.fun's reward wallet"
+    metric:
+      name: Judge win rate
+      unit: millionths
+      better: higher
+
+harness:
+  kind: program/v1
+  runtimes: [node22]
+  input_data: null
+  scorer:
+    runtime: node22
+    entrypoint: scorer/score.ts
+    reference_data: reference
+  scorer_sha256: "385f7fec318939fc0df2351e15bd412ebe7159f3876a57974b5e8cebaa547c8c"
+  reference_sha256: "bf72fd11ff34ba44f541e68cc60ba7d1bc0c79158b3c1765ccbcdfa9ee6fdc05"
+  gate: valid
+  judge:
+    agent:
+      model: superbot
+      prompt: prompt.txt
+      max_output_tokens: 17200
+      reasoning_effort: high
+    dir: judge
+    judge_sha256: "2f025609ae183a3f42c0c340fd567c1511eeddff2c7e0440c8014fc73ecc70e8"
+    ladder:
+      dir: ladder
+      ladder_sha256: "0b27667e6cbcfcf6c9c25653be94c83ad51ee0068ad143155a68dfa37b2d53ec"
+    artifact: dossier.json
+    media: dossier
+    rounds: 3
+    playoff_repeats: 1
+    screened: {}
+    contend:
+      band: 100
+      games: 8
+      top: 20
+    review:
+      places: 5
+      minutes: 60
+
+phases:
+  - key: dev
+    title: Development
+    description: Each valid entry is judged as it arrives against the four fixed house games and 8 more games against the house games nearest its strength, with 2 more house-only rounds when its rate reaches the money-place line; the top 100 by that rate also play up to 8 sealed games against one another, and the board's rates count them. Its provisional rate shows at once with its 90% interval and its screenshots on the Feed. A provisional rate is never weighed; the final heat judges every final entry afresh.
+    starts_at: "2026-11-15T18:00:00Z"
+    ends_at: "2026-11-18T18:00:00Z"
+    scores: live
+  - key: final
+    title: Final
+    description: After the deadline every final entry is screened on its dev rating; the shortlist plays 3 Swiss rounds, racing at the prize boundaries, then a playoff, and the top 5 are held for the finalist review. Its rates appear with the results, published automatically once the final grades, the judge heat and the checks after them are done.
+    starts_at: "2026-11-18T18:10:00Z"
+    ends_at: "2026-11-19T06:10:00Z"
+    scores: after_finalize
+
+leaderboard:
+  title: Results
+  primary_index: 0
+  tie_break_index: 4
+  feed: true
+  columns:
+    - {key: judge, title: Judge win rate, index: 0, sorting: desc, precision: 0, source: performance.judge.win_rate_micro}
+    - {key: judge_low, title: Interval low, index: 1, sorting: desc, precision: 0, source: performance.judge.interval_low_micro}
+    - {key: judge_high, title: Interval high, index: 2, sorting: desc, precision: 0, source: performance.judge.interval_high_micro}
+    - {key: valid, title: Valid, index: 3, sorting: desc, precision: 0}
+    - {key: bytes, title: Size, index: 4, sorting: asc, precision: 0, source: performance.judge.artifact_bytes}
+
+submission_rule:
+  rule: Force_Last
+  max_per_day: 5
+  max_total: 10
+  transcripts_required: true
+  strategy_note_required: false
+  license: osi
+  repo_created_after_open: true
+  house_only: false
+  authorship: 12
+
+prizes:
+  - {kind: placement, place: 1, amount_usd: 400, title: 1st place}
+  - {kind: placement, place: 2, amount_usd: 200, title: 2nd place}
+  - {kind: placement, place: 3, amount_usd: 120, title: 3rd place}
+  - {kind: placement, place: 4, amount_usd: 40, title: 4th place}
+  - {kind: placement, place: 5, amount_usd: 40, title: 5th place}
+  - {kind: placement, place: 6, amount_usd: 40, title: 6th place}
+  - {kind: placement, place: 7, amount_usd: 40, title: 7th place}
+  - {kind: placement, place: 8, amount_usd: 40, title: 8th place}
+  - {kind: placement, place: 9, amount_usd: 40, title: 9th place}
+  - {kind: placement, place: 10, amount_usd: 40, title: 10th place}
+
+# A house entry holds the place it finishes in, unpaid, and no entry moves up (contest-design.mdc; the Rewards section
+# says so).
+house_holds_places: true
+
+limits:
+  cpus: 1
+  memory_mb: 1024
+  pids: 64
+  wall_budget_sec: 120
+
+min_authored_coverage: 0
+
+# Full auto (the header): the lock, the grades, the judge heat, the publication and the resolve; autopay. Its escrow is
+# funded at the deploy that seeds it open (escrow: at_open), within a minute and before entries open, as the btc-race
+# release template's is: payouts auto then pays from the reward wallet only when that escrow was never funded
+# (server/competitions/load.ts escrowAtOpenIssues, escrowPayoutsIssue).
+automation:
+  lifecycle: true
+  payouts: auto
+  escrow: at_open

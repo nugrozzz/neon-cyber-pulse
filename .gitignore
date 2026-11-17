@@ -1,0 +1,8 @@
+makefun-keypair.json
+*credentials*
+*.secret.json
+*.key.json
+node_modules/
+dist/
+out/
+*.tar.gz
